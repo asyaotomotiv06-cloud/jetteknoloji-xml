@@ -1,0 +1,32 @@
+name: Merge XML Feeds
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # 6 saatte bir günceller
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: pip install requests
+
+    - name: Merge XML
+      run: python merge.py
+
+    - name: Commit merged XML
+      run: |
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+        git add jetteknoloji.xml
+        git commit -m "Update merged XML" || echo "No changes"
+        git push
